@@ -1,0 +1,24 @@
+CASA DOMNEASCA RARAU – PACHET SITE
+
+CONTINUT
+- index.html – site-ul complet
+- imagini/ – fotografiile pensiunii, sigla și pliantele Via Mariae / Via Transilvanica
+- functions/api/chat.js – endpoint-ul chatbotului AI
+- wrangler.toml – configurarea Cloudflare Pages / Workers AI
+- ACTIVEAZA-ASISTENTUL-AI.txt – pașii pentru activarea AI
+
+PUBLICARE
+1. Dezarhivați întregul ZIP într-un folder.
+2. Pentru Cloudflare Pages cu Functions, publicați folderul dezarhivat prin Git sau Wrangler (nu încărcați doar index.html și nu folosiți doar drag-and-drop static).
+3. Deschideți terminalul în folderul care conține index.html și functions/.
+4. Autentificați-vă cu: npx wrangler login
+5. Publicați: npx wrangler pages deploy . --project-name casa-domneasca-rarau
+6. În Cloudflare Pages > Settings > Bindings, adăugați Workers AI cu numele exact AI, apoi declanșați un nou deployment.
+7. Testați pe domeniul public chatul cu întrebarea: „Ce activități de aventură pot încerca în Bucovina?”
+
+IMPORTANT
+- Chatbotul are interfață și endpoint, dar răspunsurile AI reale necesită publicarea Pages Functions și binding-ul Workers AI.
+- Scorurile recenziilor sunt cele comunicate de proprietar și sunt statice; actualizați-le periodic. Recenziile live necesită integrare API/permisiuni de la platforme.
+- Rezervarea directă este un apel / contact către pensiune; nu există încă motor de rezervare cu disponibilitate și plată online.
+- Imaginile externe din secțiunea Aventură sunt afișate de la sursele indicate lângă fiecare fotografie. Drepturile aparțin titularilor; obțineți acordul/licența pentru reproducere comercială permanentă sau înlocuiți-le cu imagini autorizate.
+- Programul, tarifele și disponibilitatea activităților sunt variabile; verificați la operator înainte de publicare și vizită.

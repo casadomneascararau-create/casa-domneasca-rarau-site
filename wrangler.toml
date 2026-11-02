@@ -1,0 +1,6 @@
+name = "casa-domneasca-rarau"
+compatibility_date = "2026-11-02"
+pages_build_output_dir = "."
+
+[ai]
+binding = "AI"

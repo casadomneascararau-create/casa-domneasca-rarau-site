@@ -1,0 +1,4 @@
+CASA DOMNEASCA RARAU – SITE WEB
+Deschideți index.html într-un browser pentru previzualizare.
+Pentru publicare, încărcați index.html și folderul imagini pe server, păstrând structura.
+Fotografiile au fost optimizate pentru web.

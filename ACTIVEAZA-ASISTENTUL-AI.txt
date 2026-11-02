@@ -1,0 +1,21 @@
+ACTIVAREA ASISTENTULUI AI – CLOUDFLARE PAGES
+
+Site-ul include acum interfața de chat și funcția backend /api/chat. Pentru ca răspunsurile AI să funcționeze, proiectul trebuie publicat ca Pages project cu Functions și cu binding-ul Workers AI activat.
+
+IMPORTANT: simpla încărcare a fișierului index.html sau un upload static drag-and-drop nu publică funcția din folderul functions. Publicați proiectul cu Wrangler Pages sau printr-un Git-connected Pages project.
+
+VARIANTA WRANGLER (din folderul care conține index.html, functions/ și wrangler.toml):
+1. Instalați Node.js și Wrangler: npm install -g wrangler
+2. Autentificați: npx wrangler login
+3. În Cloudflare Dashboard > Workers & Pages, verificați numele proiectului Pages. Dacă proiectul existent are alt nume, actualizați `name` în wrangler.toml și folosiți acel nume la deploy.
+4. Publicați: npx wrangler pages deploy . --project-name casa-domneasca-rarau
+5. În Cloudflare Dashboard, deschideți proiectul Pages > Settings > Bindings > Add > Workers AI, cu variabila/binding name exact `AI`.
+6. Salvați și faceți un nou deployment.
+
+Dacă binding-ul AI este disponibil în setările proiectului, atașați-l înainte de testare. Cloudflare Workers AI poate necesita activarea/acceptarea condițiilor și poate avea costuri/limite conform planului Cloudflare.
+
+TEST:
+Deschideți site-ul, apăsați butonul „Asistent AI” din dreapta jos și întrebați „Ce tipuri de camere aveți?”. Dacă apare mesajul că asistentul nu este configurat, binding-ul AI nu este activ sau deployment-ul Pages Functions nu a fost publicat.
+
+CHEI API:
+Nu introduceți chei API în index.html. Această versiune folosește binding-ul Cloudflare Workers AI și nu expune secrete în browser.

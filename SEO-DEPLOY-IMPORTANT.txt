@@ -1,0 +1,35 @@
+PACHET SEO AVANSAT – CASA DOMNEASCĂ RĂRAU
+
+CE ADUCE ACEASTĂ VERSIUNE
+- Păstrează pagina principală, fotografiile, chatbotul și funcțiile existente.
+- Îmbunătățește titlul, descrierea și datele structurate ale paginii principale.
+- Adaugă trei pagini SEO distincte, cu texte originale:
+  1. cazare-campulung-moldovenesc.html
+  2. vacanta-in-bucovina.html
+  3. obiective-turistice-rarau.html
+- Actualizează sitemap.xml cu toate cele patru adrese.
+- Păstrează robots.txt și funcția functions/api/chat.js.
+
+PUBLICARE ÎN PROIECTUL EXISTENT CLOUDFLARE PAGES
+1. Nu șterge proiectul Cloudflare și nu modifica DNS.
+2. În GitHub, în repository-ul conectat la proiectul casa-domneasca-rarau-final, actualizează fișierul index.html cu cel din acest pachet.
+3. Încarcă în rădăcina repository-ului cele trei fișiere HTML noi.
+4. Înlocuiește sitemap.xml și robots.txt din rădăcina repository-ului cu cele din acest pachet.
+5. NU șterge folderul imagini/, folderul functions/ sau wrangler.toml.
+6. După commit, așteaptă deployment-ul automat cu bifă verde în Cloudflare Pages.
+7. Testează în browser:
+   https://casadomneascararau.ro/
+   https://casadomneascararau.ro/cazare-campulung-moldovenesc.html
+   https://casadomneascararau.ro/vacanta-in-bucovina.html
+   https://casadomneascararau.ro/obiective-turistice-rarau.html
+   https://casadomneascararau.ro/sitemap.xml
+   https://casadomneascararau.ro/robots.txt
+8. În Google Search Console > Sitemapuri, retrimite:
+   https://casadomneascararau.ro/sitemap.xml
+9. Inspectează pe rând cele trei pagini noi și apasă „Solicită indexarea”.
+
+IMPORTANT
+- Google nu garantează poziția 1; indexarea și clasarea pot dura.
+- Nu cumpăra recenzii și nu adăuga cuvinte-cheie în numele profilului Google Business.
+- Tarifele și disponibilitatea trebuie confirmate direct la pensiune.
+- Datele structurate descriu doar informații confirmate în site.

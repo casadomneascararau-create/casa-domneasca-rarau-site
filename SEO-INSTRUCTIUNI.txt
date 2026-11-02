@@ -1,0 +1,34 @@
+PACHET SEO AVANSAT – CASA DOMNEASCĂ RĂRĂU
+
+Domeniu canonic: https://casadomneascararau.ro/
+
+Pachetul conține:
+- index.html optimizat SEO, păstrând designul, galeria, chatbotul și rezervarea directă;
+- trei pagini noi, cu conținut distinct: cazare-campulung-moldovenesc.html, vacanta-in-bucovina.html, obiective-turistice-rarau.html;
+- sitemap.xml actualizat pentru toate cele patru pagini;
+- robots.txt;
+- fotografiile, functions/api/chat.js și configurarea proiectului.
+
+PUBLICARE ÎN CLOUDFLARE PAGES CONECTAT LA GITHUB
+Actualizarea se face în repository-ul GitHub conectat la proiectul existent casa-domneasca-rarau-final.
+Nu ștergeți proiectul Cloudflare și nu modificați DNS.
+Înlocuiți index.html și încărcați cele trei pagini noi în rădăcina repository-ului.
+Înlocuiți sitemap.xml și robots.txt.
+Păstrați folderul imagini/, folderul functions/ și fișierele de configurare.
+După commit, verificați deployment-ul automat în Cloudflare Pages.
+
+După publicare, verificați:
+https://casadomneascararau.ro/
+https://casadomneascararau.ro/cazare-campulung-moldovenesc.html
+https://casadomneascararau.ro/vacanta-in-bucovina.html
+https://casadomneascararau.ro/obiective-turistice-rarau.html
+https://casadomneascararau.ro/sitemap.xml
+https://casadomneascararau.ro/robots.txt
+
+În Google Search Console > Sitemapuri, retrimiteți sitemap-ul complet.
+Inspectați fiecare dintre cele trei pagini noi și solicitați indexarea.
+
+IMPORTANT
+Google nu garantează poziția 1. Rezultatele depind de relevanță, concurență, distanță și notorietate.
+Nu cumpărați recenzii și nu introduceți cuvinte-cheie artificiale în numele profilului Google Business.
+Confirmați direct tarifele, disponibilitatea și programul operatorilor turistici.

@@ -262,9 +262,7 @@ footer{text-align:center;background:#101a14;color:#cfc7b7;padding:26px;font:12px
  function addMessage(text,who){const el=document.createElement('div');el.className='cdr-msg '+who;el.textContent=text;messages.appendChild(el);messages.scrollTop=messages.scrollHeight;return el}
  async function send(text){text=(text||'').trim();if(!text)return;addMessage(text,'user');history.push({role:'user',content:text});input.value='';input.disabled=true;form.querySelector('button').disabled=true;const pending=addMessage('Scriu un răspuns…','bot');
   try{const response=await fetch('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({messages:history.slice(-10)})});const data=await response.json();if(!response.ok)throw new Error(data.error||'Serviciul de asistență nu este momentan disponibil.');const answer=data.reply||'Vă rugăm să ne contactați telefonic pentru detalii.';pending.textContent=answer;history.push({role:'assistant',content:answer});}
-  catch(err){pending.textContent='Momentan nu pot răspunde automat. Pentru informații și rezervări, vă rugăm să sunați la 0787 445 908 sau să scrieți la casa.domneasca.rarau@gmail.com.
-
-'+(err.message.includes('configurat')?'Asistentul AI trebuie activat în Cloudflare înainte de publicare.':'');}
+  catch(err){pending.textContent='Momentan nu pot răspunde automat. Pentru informații și rezervări, vă rugăm să sunați la 0787 445 908 sau să scrieți la casa.domneasca.rarau@gmail.com.\n\n'+(err.message.includes('configurat')?'Asistentul AI trebuie activat în Cloudflare înainte de publicare.':'');}
   finally{input.disabled=false;form.querySelector('button').disabled=false;input.focus();messages.scrollTop=messages.scrollHeight;}
  }
  form.addEventListener('submit',e=>{e.preventDefault();send(input.value)});

@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Meniu – Casa Domnească Rarău</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f3eb;color:#352719;font-family:Georgia,serif}
+header{text-align:center;padding:35px 15px;background:#38291d;color:#f5e6c5}
+header h1{font-size:30px;margin:8px}
+header p{letter-spacing:2px}
+main{max-width:850px;margin:auto;padding:20px}
+.controls{text-align:center;margin:20px}
+select{padding:10px;border-radius:8px}
+.item{background:white;border-radius:14px;padding:18px;margin:15px 0;box-shadow:0 3px 12px #0001}
+.item h2{margin:0 0 8px}
+.price{font-weight:bold;color:#88602c}
+.quantity{display:flex;align-items:center;gap:15px;margin-top:15px}
+button{border:0;border-radius:8px;padding:10px 16px;cursor:pointer}
+.qty{background:#eee;font-size:20px}
+.order{background:#287b48;color:white;font-weight:bold}
+.total{font-size:22px;text-align:right;padding:20px}
+footer{text-align:center;padding:25px;background:#38291d;color:white}
+</style>
+</head>
+<body>
+
+<header>
+<p>BUCOVINA • OSPITALITATE • TRADIȚIE</p>
+<h1>Casa Domnească Rarău</h1>
+<h2 id="heading">Meniu à la carte</h2>
+</header>
+
+<main>
+<div class="controls">
+<label for="language">Limba / Language:</label>
+<select id="language" onchange="changeLanguage()">
+<option value="ro">Română</option>
+<option value="en">English</option>
+<option value="fr">Français</option>
+<option value="de">Deutsch</option>
+</select>
+</div>
+
+<div id="products"></div>
+<div class="total" id="total">Total: 0 lei</div>
+<button class="order" style="width:100%;padding:16px"
+onclick="sendOrder()" id="send">
+Trimite comanda pe WhatsApp
+</button>
+</main>
+
+<footer>
+Casa Domnească Rarău<br>
+Mulțumim pentru alegere!
+</footer>
+
+<script>
+const phone="40787445908";
+
+const dishes=[
+{name:["Ciorbă rădăuțeană","Radauti soup","Soupe de Rădăuți","Radauti-Suppe"],price:26,weight:"400 g"},
+{name:["Ciorbă de legume","Vegetable soup","Soupe de légumes","Gemüsesuppe"],price:22,weight:"400 g"},
+{name:["Borș de cocoș","Rooster sour soup","Bortsch de coq","Hahnsuppe"],price:25,weight:"400 g"},
+{name:["Papanași","Romanian doughnuts","Beignets roumains","Rumänische Papanași"],price:35,weight:"200 g"},
+{name:["Clătite cu brânză","Cheese pancakes","Crêpes au fromage","Pfannkuchen mit Käse"],price:35,weight:"200 g"}
+];
+
+const words={
+ro:{title:"Meniu à la carte",total:"Total",send:"Trimite comanda pe WhatsApp",piece:"porții"},
+en:{title:"À la carte menu",total:"Total",send:"Send order on WhatsApp",piece:"portions"},
+fr:{title:"Menu à la carte",total:"Total",send:"Envoyer la commande sur WhatsApp",piece:"portions"},
+de:{title:"À-la-carte-Menü",total:"Gesamt",send:"Bestellung über WhatsApp senden",piece:"Portionen"}
+};
+
+let quantities=dishes.map(()=>0);
+let lang="ro";
+
+function changeLanguage(){
+lang=document.getElementById("language").value;
+render();
+}
+
+function render(){
+document.getElementById("heading").textContent=words[lang].title;
+document.getElementById("send").textContent=words[lang].send;
+
+let html="";
+dishes.forEach((d,i)=>{
+html+=`
+<div class="item">
+<h2>${d.name[["ro","en","fr","de"].indexOf(lang)]}</h2>
+<p>${d.weight}</p>
+<p class="price">${d.price} lei / porție</p>
+<div class="quantity">
+<button class="qty" onclick="changeQty(${i},-1)">−</button>
+<strong>${quantities[i]} ${words[lang].piece}</strong>
+<button class="qty" onclick="changeQty(${i},1)">+</button>
+</div>
+</div>`;
+});
+document.getElementById("products").innerHTML=html;
+let total=dishes.reduce((s,d,i)=>s+d.price*quantities[i],0);
+document.getElementById("total").textContent=words[lang].total+": "+total+" lei";
+}
+
+function changeQty(i,n){
+quantities[i]=Math.max(0,quantities[i]+n);
+render();
+}
+
+function sendOrder(){
+let lines=[];
+dishes.forEach((d,i)=>{
+if(quantities[i]>0){
+lines.push(d.name[["ro","en","fr","de"].indexOf(lang)]
++" – "+quantities[i]+" x "+d.price+" lei");
+}
+});
+if(!lines.length){
+alert("Selectați cel puțin un preparat.");
+return;
+}
+let total=dishes.reduce((s,d,i)=>s+d.price*quantities[i],0);
+let message="Bună ziua! Doresc să comand:\n"
++lines.join("\n")+"\nTotal: "+total+" lei";
+window.open("https://wa.me/"+phone+"?text="+encodeURIComponent(message),"_blank");
+}
+
+render();
+</script>
+</body>
+</html>

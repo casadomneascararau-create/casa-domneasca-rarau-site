@@ -76,3 +76,19 @@ A fost raportat anterior un import Booking → Travelminit reușit pentru o came
 - Se poate pregăti integrarea Google Calendar și procesarea iCal numai după verificarea eligibilității fiecărei camere și după testare.
 - Orice eveniment importat va păstra sursa și momentul ultimei citiri; conflictele și anulările ambigue vor fi marcate pentru verificare, nu șterse automat.
 - Nu vom promite sincronizare complet bidirecțională Booking ↔ Travelminit printr-un simplu calendar iCal.
+
+
+## Meta Business Agent – verificare oficială (15 noiembrie 2026)
+
+- WhatsApp descrie configurarea din fila **Tools / Instrumente → AI agent**, urmată de autentificare și confirmare în aplicația WhatsApp Business.
+- Disponibilitatea nu este garantată pentru fiecare cont: centrul oficial de ajutor spune că funcția este disponibilă doar pentru anumite companii în anumite țări și că limbile nu sunt toate acceptate. Limba agentului este determinată de numărul de telefon al companiei.
+- Dacă opțiunea nu apare în Instrumente, WhatsApp indică înscrierea pe lista de așteptare, dacă aceasta este oferită. Înscrierea nu garantează accesul și nu are un termen anunțat.
+- După activare, agentul poate fi învățat din conversațiile anterioare și din informațiile furnizate de companie; WhatsApp/Meta menționează și site-ul, catalogul, documentele și listele de prețuri. Există controale pentru cine primește răspunsuri AI și predarea conversației către operator.
+- Documentația Meta nu confirmă că agentul nativ poate scrie direct într-un Google Calendar arbitrar sau poate administra disponibilitatea Booking.com/Travelminit. Pentru asta este necesară o integrare separată, autorizată, testată.
+- Plan: pregătim baza de cunoștințe a pensiunii și regulile de rezervare; activăm agentul nativ numai dacă apare în cont și limba este acceptată; pentru scrierea în Google Calendar folosim un serviciu separat cu OAuth și verificare de conflicte.
+
+Surse oficiale:
+- https://faq.whatsapp.com/1153795669452207/
+- https://faq.whatsapp.com/810657551906035
+- https://whatsappbusiness.com/products/business-app-ai-agent/
+- https://ai.meta.com/ro-ro/meta-business-agent/platform/

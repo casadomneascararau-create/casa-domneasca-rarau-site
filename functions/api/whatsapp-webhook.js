@@ -125,10 +125,10 @@ export async function onRequestPost({ request, env }) {
           let calendarContext = '';
           try {
             const context = await getCalendarContext(env, incoming);
-            if (context) calendarContext = '\\n\\nINTERNAL CALENDAR CONTEXT (read-only): ' + context;
+            if (context) calendarContext = '\n\nINTERNAL CALENDAR CONTEXT (read-only): ' + context;
           } catch (calendarError) {
             console.error('Google Calendar lookup error:', calendarError);
-            calendarContext = '\\n\\nINTERNAL CALENDAR CONTEXT: calendar lookup failed; do not claim availability.';
+            calendarContext = '\n\nINTERNAL CALENDAR CONTEXT: calendar lookup failed; do not claim availability.';
           }
           const result = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
             messages: [

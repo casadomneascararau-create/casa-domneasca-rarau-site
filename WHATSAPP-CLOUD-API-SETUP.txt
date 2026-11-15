@@ -1,0 +1,38 @@
+INTEGRARE WHATSAPP BUSINESS – Cloud API (Preview)
+
+Endpoint webhook:
+- GET/POST https://casadomneascararau.ro/api/whatsapp
+- Configurează acest URL în Meta for Developers > aplicația WhatsApp > Configuration > Webhooks.
+- Verify token: valoarea secretului WHATSAPP_VERIFY_TOKEN din Cloudflare.
+- Abonează webhook-ul la câmpul messages.
+
+Secrets/variables Cloudflare Pages (Preview mai întâi):
+- WHATSAPP_VERIFY_TOKEN (secret aleatoriu ales de proprietar)
+- WHATSAPP_APP_SECRET (App Secret din Meta; secret)
+- WHATSAPP_ACCESS_TOKEN (token permanent/system-user, secret)
+- WHATSAPP_PHONE_NUMBER_ID (ID-ul numărului WhatsApp din Meta)
+- WHATSAPP_GRAPH_VERSION (variabilă text; setează o versiune Graph API activă în contul Meta)
+- BOOKING binding: BOOKINGS (D1)
+
+Migrare D1:
+- Aplică migrations/0002_whatsapp_webhook_events.sql după migrarea 0001.
+
+Comportament în această etapă:
+- Răspunde la mesajele text primite pe WhatsApp.
+- Pentru verificarea disponibilității, clientul trimite:
+  DISPONIBILITATE AAAA-LL-ZZ AAAA-LL-ZZ
+- Citește camerele ocupate din D1 și listează camerele libere.
+- Verifică semnătura webhook-ului Meta și evită procesarea repetată a aceluiași message ID.
+- Nu confirmă, nu creează, nu modifică și nu anulează rezervări. Aceste acțiuni rămân dezactivate până la autentificarea administratorului, fluxul de confirmare și testarea sincronizărilor.
+
+IMPORTANT – numărul existent:
+Nu migra și nu elimina numărul +40 787 445 908 din WhatsApp Business App. Înainte de activare, verifică în Meta dacă numărul este eligibil pentru coexistence (Business App + Cloud API) în țara și contul respectiv. Dacă Meta cere migrare, oprește configurarea și cere acordul explicit al proprietarului.
+
+Testare:
+1. Configurează toate variabilele numai în Cloudflare Preview.
+2. Verifică GET webhook prin Meta.
+3. Trimite un mesaj de test și verifică răspunsul.
+4. Testează o perioadă ocupată și una liberă.
+5. Abia după testare se discută activarea Production.
+
+Nu introduce tokenuri, App Secret sau coduri de autentificare în GitHub ori în conversații.

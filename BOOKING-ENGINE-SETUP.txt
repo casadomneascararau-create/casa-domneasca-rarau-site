@@ -1,0 +1,26 @@
+CONFIGURARE MOTOR REZERVĂRI – mediu de test
+
+Inventar confirmat:
+- Camerele 1–2: duble, capacitate 2
+- Camerele 3–4: triple, capacitate 3
+- Camerele 5–7: cvadruple, capacitate 4
+
+Această etapă adaugă un nucleu API de test și schema D1. Nu activează încă rezervări publice și nu sincronizează încă Google Calendar, Booking.com, Travelminit sau WhatsApp.
+
+Pași Cloudflare (după revizuirea PR):
+1. Creează o bază Cloudflare D1, de exemplu `casa-domneasca-bookings`.
+2. Aplică migrarea `migrations/0001_booking_engine.sql`.
+3. În Pages > Settings > Bindings adaugă D1 Database binding cu numele exact `BOOKINGS`.
+4. În Variables and secrets adaugă un secret `ADMIN_TOKEN` generat aleatoriu și păstrat doar în Cloudflare.
+5. Configurează și testează pe Preview înainte de Production.
+
+API:
+- GET /api/booking?checkIn=YYYY-MM-DD&checkOut=YYYY-MM-DD – returnează camere disponibile.
+- POST /api/booking – rezervare administrativă, necesită Authorization: Bearer <ADMIN_TOKEN>.
+  Body: { roomId, checkIn, checkOut, guestName, guestPhone, guests, source }.
+
+Important:
+- Nu transmite tokenul în browser și nu îl introduce în GitHub.
+- POST este blocat pentru public până la autentificare sigură și fluxul de confirmare.
+- iCal/Google Calendar nu sunt conectate în această etapă. D1 este pregătit ca sursă centrală; sincronizarea externă trebuie implementată separat, cu OAuth și verificare de conflicte.
+- Nu se importă automat evenimentele existente; înainte de activare trebuie importate/verificate rezervările curente din toate canalele.

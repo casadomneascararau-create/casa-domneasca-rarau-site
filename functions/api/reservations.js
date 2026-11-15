@@ -69,6 +69,18 @@ function validDate(s) {
   return !Number.isNaN(d.valueOf()) && d.toISOString().slice(0,10) === s;
 }
 
+function bucharestMidnight(date) {
+  const probe = new Date(date + "T12:00:00Z");
+  const part = new Intl.DateTimeFormat("en-US", {
+    timeZone: TZ, timeZoneName: "shortOffset"
+  }).formatToParts(probe).find(p => p.type === "timeZoneName")?.value || "GMT+2";
+  const match = part.match(/GMT([+-])(\\d{1,2})(?::(\\d{2}))?/);
+  const sign = match?.[1] === "-" ? "-" : "+";
+  const hours = String(Number(match?.[2] || 2)).padStart(2, "0");
+  const minutes = String(Number(match?.[3] || 0)).padStart(2, "0");
+  return date + "T00:00:00" + sign + hours + ":" + minutes;
+}
+
 function calendarForRoom(env, roomId) {
   if (!ROOM_IDS.includes(roomId)) return null;
   return env["GOOGLE_CALENDAR_" + roomId.replace("-", "_").toUpperCase()];

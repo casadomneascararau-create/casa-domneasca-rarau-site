@@ -4,3 +4,8 @@ pages_build_output_dir = "."
 
 [ai]
 binding = "AI"
+
+[[d1_databases]]
+binding = "BOOKINGS"
+database_name = "casa-domneasca-bookings"
+database_id = "09c9e2a3-bfb7-423c-872a-7ec0414b38b7"

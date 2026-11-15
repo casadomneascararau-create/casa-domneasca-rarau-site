@@ -52,3 +52,27 @@ Maparea camerelor 1–5 urmează confirmarea proprietarului că numerele corespu
 ## Stare inițială cunoscută
 
 A fost raportat anterior un import Booking → Travelminit reușit pentru o cameră, dar camera exactă nu este confirmată. A fost afișat un link de export iCal Travelminit; importul invers în Booking nu este confirmat. Aceste legături trebuie verificate în conturi, fără a copia tokenurile private în repository.
+
+
+## Verificare oficială a integrărilor (15 noiembrie 2026)
+
+### Booking.com
+- Pagina oficială Booking.com Connectivity Portal afirmă că înscrierea noilor furnizori de conectivitate este suspendată până la noi informații.
+- Booking.com precizează că proprietățile individuale nu se pot conecta direct la Connectivity APIs; proprietarii pot folosi un furnizor de conectivitate/channel manager.
+- Prin urmare, pentru proiectul independent al unei singure pensiuni nu putem presupune că vom primi acces API. Nu vom construi sau activa apeluri API fără aprobarea oficială Booking.com.
+- Surse oficiale:
+  - https://connect.booking.com/
+  - https://developers.booking.com/connectivity/docs
+
+### Travelminit
+- Documentația oficială Travelminit descrie sincronizarea iCalendar pentru unitățile eligibile.
+- Eligibilitatea descrisă include unități cu mai multe tipuri de cameră, dacă există câte o singură unitate din fiecare tip; trebuie verificat în cont dacă inventarul concret al pensiunii este eligibil.
+- Travelminit spune că sincronizarea nu este în timp real și poate dura până la 60 de minute.
+- Rezervările de pe canale care nu pot fi sincronizate trebuie introduse manual în calendarul Travelminit.
+- Sursa oficială: https://travelminit.ro/sincronizare-calendar-prin-icalendar
+
+### Consecință de proiectare
+- Prima versiune va fi un registru central și un instrument de monitorizare/reconciliere, nu un channel manager și nu un mecanism de blocare garantată în timp real.
+- Se poate pregăti integrarea Google Calendar și procesarea iCal numai după verificarea eligibilității fiecărei camere și după testare.
+- Orice eveniment importat va păstra sursa și momentul ultimei citiri; conflictele și anulările ambigue vor fi marcate pentru verificare, nu șterse automat.
+- Nu vom promite sincronizare complet bidirecțională Booking ↔ Travelminit printr-un simplu calendar iCal.

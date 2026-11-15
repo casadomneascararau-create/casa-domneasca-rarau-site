@@ -99,8 +99,23 @@ export async function onRequestPost({ request, env }) {
     return Response.json({ error: 'Trimiteți un mesaj pentru a continua.' }, { status: 400 });
   }
   try {
+    let calendarContext = '';
+    try {
+      const latestUserMessage = messages.filter(m => m.role === 'user').at(-1)?.content || '';
+      const calendar = await getCalendarBusy(env, latestUserMessage);
+      if (calendar) {
+        const rows = Object.entries(calendar.calendars).map(([id, info]) => {
+          const busy = (info?.busy || []).map(period => `${period.start} – ${period.end}`).join('; ');
+          return `${id}: ${info?.errors?.length ? 'verificare indisponibilă' : (busy || 'nu au fost returnate intervale ocupate')}`;
+        });
+        calendarContext = `\n\nCONTEXT CALENDAR (doar citire, verificare preliminară pentru ${calendar.start} – ${calendar.end}): ${rows.join(' | ')}. Nu confirma rezervări și nu presupune corespondența dintre calendare și camere; solicită confirmarea proprietarului.`;
+      }
+    } catch (calendarError) {
+      console.error('Google Calendar lookup error:', calendarError);
+      calendarContext = '\n\nCONTEXT CALENDAR: verificarea calendarului a eșuat. Nu afirma disponibilitatea.';
+    }
     const result = await env.AI.run('@cf/meta/llama-3.3-70b-instruct-fp8-fast', {
-      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages],
+      messages: [{ role: 'system', content: SYSTEM_PROMPT }, ...messages.slice(0, -1), { role: 'user', content: messages[messages.length - 1].content + calendarContext }],
       max_tokens: 450,
       temperature: 0.35
     });

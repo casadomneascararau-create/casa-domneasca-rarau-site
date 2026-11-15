@@ -1,0 +1,14 @@
+# EXEMPLU LOCAL – nu completa cu valori reale și nu încărca secrete în Git.
+# Copiază în .dev.vars doar în mediul local privat; .dev.vars trebuie ignorat de Git.
+RESERVATION_API_SECRET=INLOCUIESTE_CU_UN_SECRET_ALEATOR_LUNG
+GOOGLE_SERVICE_ACCOUNT_EMAIL=service-account@PROJECT_ID.iam.gserviceaccount.com
+GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nINLOCUIESTE_CU_CHEIA_PRIVATA\n-----END PRIVATE KEY-----\n"
+
+# ID-urile calendarului fiecărei camere, după creare și partajare cu service account.
+GOOGLE_CALENDAR_ROOM_1=room1-calendar-id@group.calendar.google.com
+GOOGLE_CALENDAR_ROOM_2=room2-calendar-id@group.calendar.google.com
+GOOGLE_CALENDAR_ROOM_3=room3-calendar-id@group.calendar.google.com
+GOOGLE_CALENDAR_ROOM_4=room4-calendar-id@group.calendar.google.com
+GOOGLE_CALENDAR_ROOM_5=room5-calendar-id@group.calendar.google.com
+GOOGLE_CALENDAR_ROOM_6=room6-calendar-id@group.calendar.google.com
+GOOGLE_CALENDAR_ROOM_7=room7-calendar-id@group.calendar.google.com

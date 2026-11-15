@@ -28,6 +28,59 @@ REGULI:
 - Dacă nu știi un răspuns, spune clar acest lucru și îndrumă clientul să contacteze pensiunea.
 - Nu pretinde că ești om sau că ai acces la sistemul de rezervări.`;
 
+
+function b64url(value) {
+  const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : new Uint8Array(value);
+  let binary = '';
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');
+}
+
+async function getCalendarBusy(env, userMessage) {
+  const ids = (env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID || '').split(',').map(x => x.trim()).filter(Boolean);
+  if (!ids.length || !env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY) return null;
+  const dates = [...userMessage.matchAll(/\\b(20\\d{2})-(\\d{2})-(\\d{2})\\b/g)].map(m => m[0]);
+  const roDates = [...userMessage.matchAll(/\\b(\\d{1,2})[.\\/](\\d{1,2})[.\\/](20\\d{2})\\b/g)]
+    .map(m => `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`);
+  const unique = [...new Set([...dates, ...roDates])].filter(d => !Number.isNaN(Date.parse(d + 'T00:00:00Z')));
+  if (unique.length < 2) return null;
+  const [start, end] = unique.slice(0, 2).sort();
+  if (end <= start) return null;
+  const now = Math.floor(Date.now() / 1000);
+  const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
+  const claim = b64url(JSON.stringify({
+    iss: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+    scope: 'https://www.googleapis.com/auth/calendar.readonly',
+    aud: 'https://oauth2.googleapis.com/token',
+    iat: now,
+    exp: now + 3600
+  }));
+  const unsigned = header + '.' + claim;
+  const pem = env.GOOGLE_PRIVATE_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g, '');
+  const keyBytes = Uint8Array.from(atob(pem), ch => ch.charCodeAt(0));
+  const key = await crypto.subtle.importKey('pkcs8', keyBytes, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
+  const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));
+  const assertion = unsigned + '.' + b64url(sig);
+  const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion })
+  });
+  const tokenData = await tokenResponse.json();
+  if (!tokenResponse.ok || !tokenData.access_token) throw new Error('Google authorization failed');
+  const busyResponse = await fetch('https://www.googleapis.com/calendar/v3/freeBusy', {
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + tokenData.access_token, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      timeMin: start + 'T00:00:00Z',
+      timeMax: end + 'T23:59:59Z',
+      items: ids.map(id => ({ id }))
+    })
+  });
+  const data = await busyResponse.json();
+  if (!busyResponse.ok) throw new Error('Google Calendar lookup failed');
+  return { start, end, calendars: data.calendars || {} };
+}
+
 export async function onRequestPost({ request, env }) {
   if (!env.AI || typeof env.AI.run !== 'function') {
     return Response.json({ error: 'Asistentul AI nu este configurat în Cloudflare.' }, { status: 503 });

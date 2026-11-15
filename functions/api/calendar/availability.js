@@ -13,7 +13,7 @@ function json(data, status = 200) {
 }
 
 async function googleAccessToken(env) {
-  if (!env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY || !env.GOOGLE_CALENDAR_ID) {
+  if (!env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY || !(env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID)) {
     throw new Error('Google Calendar credentials are not configured.');
   }
   const now = Math.floor(Date.now() / 1000);
@@ -62,17 +62,12 @@ export async function onRequestGet({ request, env }) {
       body: JSON.stringify({
         timeMin,
         timeMax,
-        items: [{ id: env.GOOGLE_CALENDAR_ID }]
+        items: (env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID).split(',').map(id => id.trim()).filter(Boolean).map(id => ({ id }))
       })
     });
     const data = await response.json();
     if (!response.ok) return json({ error: 'Google Calendar availability lookup failed.' }, 502);
-    const calendar = data.calendars?.[env.GOOGLE_CALENDAR_ID];
-    return json({
-      calendarId: env.GOOGLE_CALENDAR_ID,
-      busy: calendar?.busy || [],
-      errors: calendar?.errors || []
-    });
+    return json({ calendars: data.calendars || {} });
   } catch (error) {
     console.error('Calendar availability error:', error?.message || error);
     return json({ error: 'Google Calendar is not configured or could not be reached.' }, 503);

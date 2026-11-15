@@ -4,7 +4,7 @@ INFORMAȚII CONFIRMATE:
 - Adresă: Calea Transilvaniei nr. 40, Câmpulung Moldovenesc, județul Suceava.
 - Telefon rezervări: 0787 445 908.
 - E-mail: casa.domneasca.rarau@gmail.com.
-- Sunt prezentate cinci camere: două camere duble și trei camere triple.
+- Pensiunea are șapte camere: camerele 1–2 sunt duble, camerele 3–4 sunt triple, iar camerele 5–7 sunt cvadruple.
 - Camerele duble au tarif publicat pe site de 300 lei/noapte.
 - Micul dejun este inclus.
 - Pensiunea are bucătărie à la carte, cramă și două terase.

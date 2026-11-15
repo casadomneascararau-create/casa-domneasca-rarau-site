@@ -136,3 +136,17 @@ Răspunsul de creare conține `created`, `eventId` și `htmlLink`. Dacă interva
 - Instrumentele conectate în această sesiune permit listarea calendarelor și gestionarea evenimentelor, dar nu crearea calendarelor. ID-urile celor 7 calendare trebuie obținute după creare și partajare.
 - Meta Business Agent nu oferă, în ecranul de instrucțiuni observat, un câmp de webhook/API action. Endpoint-ul nu este chemat automat de agent. Este necesară o integrare Meta oficială care poate apela endpoint-ul sau un flux WhatsApp Business Cloud API separat.
 - Înainte de activare: teste de suprapunere, anulare, reîncercare/idempotency, permisiuni și protecția datelor. Prototipul verifică disponibilitatea înainte de insert, dar două cereri concurente pot necesita blocare tranzacțională suplimentară pentru a elimina complet riscul de dublă rezervare.
+
+
+## Descoperire suplimentară – conectare nativă Meta Business Agent la calendar
+
+La verificarea paginii oficiale Meta Business Agent Platform, Meta descrie explicit cazul de utilizare „Reservation and booking” și sincronizarea rezervărilor cu un calendar. Meta menționează și conectarea la date/sisteme proprii prin pre-built connectors, precum și API-uri și ghiduri pentru integrarea agentului cu infrastructura companiei.
+
+Sursă oficială:
+- https://ai.meta.com/meta-business-agent/platform/
+
+Consecință:
+1. Înainte de a construi o integrare WhatsApp Cloud API complet separată, trebuie încercată conectarea nativă a calendarului din aplicația WhatsApp Business, din secțiunea Instrumente → Agent AI/Meta Business Agent → Rezervare programări clienți → Conectați calendarul → Google Calendar, conform pașilor indicați de agent în conversația proprietarului.
+2. Proprietarul trebuie să autorizeze Google prin fluxul OAuth oficial; această confirmare nu poate fi făcută de asistent în numele proprietarului.
+3. După conectare, se verifică exact dacă integrarea suportă inventar de 7 camere distincte, alocarea unei camere per rezervare, verificarea suprapunerilor și anulări/modificări. O sincronizare de programări într-un calendar simplu nu dovedește automat gestiunea corectă a 7 camere.
+4. Dacă integrarea nativă nu suportă alocarea camerelor, se continuă cu API-ul separat din `functions/api/reservations.js` și cu un conector Meta/API autorizat.

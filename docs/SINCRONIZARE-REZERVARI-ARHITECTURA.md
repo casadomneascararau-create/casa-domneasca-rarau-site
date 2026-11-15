@@ -92,3 +92,47 @@ Surse oficiale:
 - https://faq.whatsapp.com/810657551906035
 - https://whatsappbusiness.com/products/business-app-ai-agent/
 - https://ai.meta.com/ro-ro/meta-business-agent/platform/
+
+
+## Prototip API Google Calendar – pregătit în branch (15 noiembrie 2026)
+
+A fost adăugat endpoint-ul separat `functions/api/reservations.js`. Acesta este cod de integrare pregătit pentru configurare, NU este încă publicat și NU este conectat la Meta Business Agent.
+
+### Funcții implementate în prototip
+- Autentificare prin secret Bearer dedicat.
+- Validarea camerei, datelor și intervalului.
+- Verificarea ocupării prin Google Calendar FreeBusy.
+- Crearea unui eveniment de tip all-day în calendarul camerei după reverificarea disponibilității.
+- Fus orar Europe/Bucharest, inclusiv calculul offsetului de vară/iarnă.
+- Refuză crearea dacă există un conflict.
+
+### Configurare necesară în mediul Cloudflare separat
+Secrete/variabile obligatorii:
+- `RESERVATION_API_SECRET` – secret aleatoriu lung pentru apelurile API.
+- `GOOGLE_SERVICE_ACCOUNT_EMAIL` – e-mailul service account Google.
+- `GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY` – cheia privată PEM a service account.
+- `GOOGLE_CALENDAR_ROOM_1` … `GOOGLE_CALENDAR_ROOM_7` – ID-urile calendarelor fiecărei camere.
+
+Fiecare calendar trebuie partajat cu service account-ul cu dreptul „Make changes to events”. Cheia privată și secretul API se introduc numai în Cloudflare Secrets, niciodată în GitHub, WhatsApp sau frontend.
+
+### Contract API
+POST `/api/reservations`, header `Authorization: Bearer <RESERVATION_API_SECRET>`.
+
+Verificare:
+```json
+{"action":"availability","roomId":"room-1","arrival":"2026-12-20","departure":"2026-12-23"}
+```
+
+Creare:
+```json
+{"action":"create","roomId":"room-1","arrival":"2026-12-20","departure":"2026-12-23","guestName":"Nume client","guestPhone":"07...","adults":2,"children":0,"source":"WhatsApp"}
+```
+
+Răspunsul de creare conține `created`, `eventId` și `htmlLink`. Dacă intervalul este ocupat, endpoint-ul întoarce HTTP 409 și nu creează evenimentul.
+
+### Limitări înainte de producție
+- Nu s-a creat încă un proiect Cloudflare separat, nu s-au setat secretele și nu s-a făcut deploy.
+- Conectorul Google Calendar disponibil în ChatGPT nu transferă automat autorizarea către Cloudflare; este necesar service account configurat și partajarea calendarelor.
+- Instrumentele conectate în această sesiune permit listarea calendarelor și gestionarea evenimentelor, dar nu crearea calendarelor. ID-urile celor 7 calendare trebuie obținute după creare și partajare.
+- Meta Business Agent nu oferă, în ecranul de instrucțiuni observat, un câmp de webhook/API action. Endpoint-ul nu este chemat automat de agent. Este necesară o integrare Meta oficială care poate apela endpoint-ul sau un flux WhatsApp Business Cloud API separat.
+- Înainte de activare: teste de suprapunere, anulare, reîncercare/idempotency, permisiuni și protecția datelor. Prototipul verifică disponibilitatea înainte de insert, dar două cereri concurente pot necesita blocare tranzacțională suplimentară pentru a elimina complet riscul de dublă rezervare.

@@ -2,12 +2,12 @@ function b64url(value) {
   const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : new Uint8Array(value);
   let binary = '';
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');
+  return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
 function extractDates(message) {
-  const iso = [...message.matchAll(/\\b(20\\d{2})-(\\d{2})-(\\d{2})\\b/g)].map(m => m[0]);
-  const ro = [...message.matchAll(/\\b(\\d{1,2})[./](\\d{1,2})[./](20\\d{2})\\b/g)]
+  const iso = [...message.matchAll(/\b(20\d{2})-(\d{2})-(\d{2})\b/g)].map(m => m[0]);
+  const ro = [...message.matchAll(/\b(\d{1,2})[./](\d{1,2})[./](20\d{2})\b/g)]
     .map(m => `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`);
   return [...new Set([...iso, ...ro])].filter(d => !Number.isNaN(Date.parse(d + 'T00:00:00Z'))).sort();
 }
@@ -30,7 +30,7 @@ async function getCalendarAvailability(env, message) {
     iat: now, exp: now + 3600
   }));
   const unsigned = header + '.' + claim;
-  const pem = env.GOOGLE_PRIVATE_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g, '');
+  const pem = env.GOOGLE_PRIVATE_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, '');
   const keyBytes = Uint8Array.from(atob(pem), ch => ch.charCodeAt(0));
   const key = await crypto.subtle.importKey('pkcs8', keyBytes,
     { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
@@ -70,13 +70,13 @@ function makeReply(message, availability) {
     if (!checked.length) return 'Nu am reușit să verificăm calendarele. Vă rugăm să sunați la 0787 445 908 pentru confirmarea disponibilității.';
     const free = checked.filter(r => !r.busy).map(r => r.name);
     const busy = checked.filter(r => r.busy).map(r => r.name);
-    let reply = `Am verificat preliminar calendarele pentru ${availability.start} – ${availability.end}.\\n`;
-    reply += free.length ? `Fără evenimente ocupate în calendar: ${free.join(', ')}.\\n` : '';
-    reply += busy.length ? `Cu evenimente ocupate: ${busy.join(', ')}.\\n` : '';
+    let reply = `Am verificat preliminar calendarele pentru ${availability.start} – ${availability.end}.\n`;
+    reply += free.length ? `Fără evenimente ocupate în calendar: ${free.join(', ')}.\n` : '';
+    reply += busy.length ? `Cu evenimente ocupate: ${busy.join(', ')}.\n` : '';
     reply += 'Aceasta este o verificare preliminară; disponibilitatea și rezervarea trebuie confirmate de proprietate la 0787 445 908.';
     return reply;
   }
-  if (/\\b(20\\d{2})-(\\d{2})-(\\d{2})\\b|\\b\\d{1,2}[./]\\d{1,2}[./]20\\d{2}\\b/.test(message)) {
+  if (/\b(20\d{2})-(\d{2})-(\d{2})\b|\b\d{1,2}[./]\d{1,2}[./]20\d{2}\b/.test(message)) {
     return 'Pentru verificarea disponibilității, trimiteți perioada completă cu data sosirii și data plecării (de exemplu 20.12.2026 – 22.12.2026), tipul camerei și numărul de persoane.';
   }
   if (/pre[tț]|tarif|cost|lei|preț/i.test(q)) {

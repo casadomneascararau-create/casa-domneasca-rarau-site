@@ -39,8 +39,8 @@ function b64url(value) {
 async function getCalendarBusy(env, userMessage) {
   const ids = (env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID || '').split(',').map(x => x.trim()).filter(Boolean);
   if (!ids.length || !env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY) return null;
-  const dates = [...userMessage.matchAll(/\b(20\d{2})-(\d{2})-(\d{2})\\b/g)].map(m => m[0]);
-  const roDates = [...userMessage.matchAll(/\b(\d{1,2})[.\\/](\d{1,2})[.\\/](20\d{2})\\b/g)]
+  const dates = [...userMessage.matchAll(/\b(20\d{2})-(\d{2})-(\d{2})\b/g)].map(m => m[0]);
+  const roDates = [...userMessage.matchAll(/\b(\d{1,2})[./](\d{1,2})[.\\/](20\d{2})\b/g)]
     .map(m => `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`);
   const unique = [...new Set([...dates, ...roDates])].filter(d => !Number.isNaN(Date.parse(d + 'T00:00:00Z')));
   if (unique.length < 2) return null;

@@ -7,7 +7,7 @@ function b64url(value) {
   const bytes = typeof value === 'string' ? new TextEncoder().encode(value) : new Uint8Array(value);
   let binary = '';
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/=/g, '').replace(/\\+/g, '-').replace(/\\//g, '_');
+  return btoa(binary).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
 }
 
 // Read-only Google Calendar lookup. It never creates, edits, or confirms reservations.
@@ -16,8 +16,8 @@ async function getCalendarContext(env, message) {
     .split(',').map(x => x.trim()).filter(Boolean);
   if (!ids.length || !env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY) return null;
 
-  const iso = [...message.matchAll(/\\b(20\\d{2})-(\\d{2})-(\\d{2})\\b/g)].map(m => m[0]);
-  const ro = [...message.matchAll(/\\b(\\d{1,2})[./](\\d{1,2})[./](20\\d{2})\\b/g)]
+  const iso = [...message.matchAll(/\b(20\d{2})-(\d{2})-(\d{2})\b/g)].map(m => m[0]);
+  const ro = [...message.matchAll(/\b(\d{1,2})[./](\d{1,2})[./](20\d{2})\b/g)]
     .map(m => `${m[3]}-${m[2].padStart(2, '0')}-${m[1].padStart(2, '0')}`);
   const dates = [...new Set([...iso, ...ro])].filter(d => !Number.isNaN(Date.parse(d + 'T00:00:00Z')));
   if (dates.length < 2) return null;
@@ -33,7 +33,7 @@ async function getCalendarContext(env, message) {
     iat: now, exp: now + 3600
   }));
   const unsigned = header + '.' + claim;
-  const pem = env.GOOGLE_PRIVATE_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\\s/g, '');
+  const pem = env.GOOGLE_PRIVATE_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, '');
   const keyBytes = Uint8Array.from(atob(pem), ch => ch.charCodeAt(0));
   const key = await crypto.subtle.importKey('pkcs8', keyBytes,
     { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);

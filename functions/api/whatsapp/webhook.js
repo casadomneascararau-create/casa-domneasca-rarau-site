@@ -23,13 +23,14 @@ async function verifySignature(request, rawBody, secret) {
 }
 
 async function sendWhatsAppText(env, to, body) {
-  if (!env.WHATSAPP_ACCESS_TOKEN || !env.WHATSAPP_PHONE_NUMBER_ID) {
+  const accessToken = env.WHATSAPP_ACCESS_TOKEN || env['WHATSAPP_ACCES_TOKEN.'];
+  if (!accessToken || !env.WHATSAPP_PHONE_NUMBER_ID) {
     throw new Error('WhatsApp API credentials are not configured.');
   }
   const response = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${env.WHATSAPP_PHONE_NUMBER_ID}/messages`, {
     method: 'POST',
     headers: {
-      'Authorization': `Bearer ${env.WHATSAPP_ACCESS_TOKEN}`,
+      'Authorization': `Bearer ${accessToken}`,
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({

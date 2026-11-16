@@ -13,7 +13,9 @@ function json(data, status = 200) {
 }
 
 async function googleAccessToken(env) {
-  if (!env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY || !(env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID)) {
+  const privateKey = env.GOOGLE_PRIVATE_KEY || env['GOOGLE_PRIVATE_KEY.'];
+  const calendarIds = env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID;
+  if (!env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !privateKey || !calendarIds) {
     throw new Error('Google Calendar credentials are not configured.');
   }
   const now = Math.floor(Date.now() / 1000);
@@ -26,7 +28,7 @@ async function googleAccessToken(env) {
     exp: now + 3600
   }));
   const unsigned = header + '.' + claim;
-  const pem = env.GOOGLE_PRIVATE_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, '');
+  const pem = privateKey.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, '');
   const binary = Uint8Array.from(atob(pem), c => c.charCodeAt(0));
   const key = await crypto.subtle.importKey(
     'pkcs8', binary, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']
@@ -62,7 +64,7 @@ export async function onRequestGet({ request, env }) {
       body: JSON.stringify({
         timeMin,
         timeMax,
-        items: (env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID).split(',').map(id => id.trim()).filter(Boolean).map(id => ({ id }))
+        items: calendarIds.split(',').map(id => id.trim()).filter(Boolean).map(id => ({ id }))
       })
     });
     const data = await response.json();

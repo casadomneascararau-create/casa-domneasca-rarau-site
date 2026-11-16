@@ -57,6 +57,8 @@ export async function onRequestGet({ request, env }) {
     return json({ error: 'Provide valid timeMin and timeMax ISO timestamps.' }, 400);
   }
   try {
+    const calendarIds = env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID;
+    if (!calendarIds) return json({ error: 'Google Calendar IDs are not configured.' }, 503);
     const token = await googleAccessToken(env);
     const response = await fetch('https://www.googleapis.com/calendar/v3/freeBusy', {
       method: 'POST',

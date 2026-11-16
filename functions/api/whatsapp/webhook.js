@@ -8,7 +8,7 @@ function json(data, status = 200) {
 }
 
 async function verifySignature(request, rawBody, secret) {
-  if (!secret) return true;
+  if (!secret) return false;
   const signature = request.headers.get('X-Hub-Signature-256') || '';
   if (!signature.startsWith('sha256=')) return false;
   const key = await crypto.subtle.importKey(

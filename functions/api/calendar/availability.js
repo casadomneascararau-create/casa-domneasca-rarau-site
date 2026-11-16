@@ -22,7 +22,7 @@ async function googleAccessToken(env) {
   const header = b64url(JSON.stringify({ alg: 'RS256', typ: 'JWT' }));
   const claim = b64url(JSON.stringify({
     iss: env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-    scope: 'https://www.googleapis.com/auth/calendar.readonly',
+    scope: 'https://www.googleapis.com/auth/calendar',
     aud: 'https://oauth2.googleapis.com/token',
     iat: now,
     exp: now + 3600
@@ -73,5 +73,78 @@ export async function onRequestGet({ request, env }) {
   } catch (error) {
     console.error('Calendar availability error:', error?.message || error);
     return json({ error: 'Google Calendar is not configured or could not be reached.' }, 503);
+  }
+}
+
+
+export async function onRequestPost({ request, env }) {
+  const auth = request.headers.get('Authorization') || '';
+  if (!env.WHATSAPP_VERIFY_TOKEN || auth !== 'Bearer ' + env.WHATSAPP_VERIFY_TOKEN) {
+    return json({ error: 'Unauthorized.' }, 401);
+  }
+  let body;
+  try { body = await request.json(); } catch { return json({ error: 'Invalid JSON.' }, 400); }
+  const { checkIn, checkOut, roomNumber, guestName, phone, adults = 1, children = 0, bookingRef } = body || {};
+  const validDate = value => typeof value === 'string' && /^\\d{4}-\\d{2}-\\d{2}$/.test(value) && !Number.isNaN(Date.parse(value + 'T00:00:00Z'));
+  if (!validDate(checkIn) || !validDate(checkOut) || checkOut <= checkIn ||
+      !Number.isInteger(roomNumber) || roomNumber < 1 || roomNumber > 7 ||
+      typeof guestName !== 'string' || guestName.trim().length < 2 || guestName.length > 100 ||
+      typeof phone !== 'string' || !/^\\+?[0-9 ()-]{8,20}$/.test(phone) ||
+      !Number.isInteger(adults) || adults < 1 || adults > 12 ||
+      !Number.isInteger(children) || children < 0 || children > 10 ||
+      typeof bookingRef !== 'string' || !/^[A-Za-z0-9_-]{8,64}$/.test(bookingRef)) {
+    return json({ error: 'Required: valid checkIn/checkOut, roomNumber 1-7, guestName, phone, adults, children and bookingRef.' }, 400);
+  }
+  try {
+    const privateKey = env.GOOGLE_PRIVATE_KEY || env['GOOGLE_PRIVATE_KEY.'];
+    const calendarIds = (env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID || '').split(',').map(x => x.trim()).filter(Boolean);
+    if (!env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !privateKey || calendarIds.length < 7) {
+      return json({ error: 'Google Calendar credentials or seven room calendars are missing.' }, 503);
+    }
+    const token = await googleAccessToken(env);
+    const calendarId = calendarIds[roomNumber - 1];
+    const freeBusy = await fetch('https://www.googleapis.com/calendar/v3/freeBusy', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        timeMin: checkIn + 'T00:00:00+02:00',
+        timeMax: checkOut + 'T00:00:00+02:00',
+        items: [{ id: calendarId }]
+      })
+    });
+    const busyData = await freeBusy.json();
+    if (!freeBusy.ok || busyData.calendars?.[calendarId]?.errors?.length) {
+      return json({ error: 'Calendar availability could not be verified.' }, 502);
+    }
+    if ((busyData.calendars?.[calendarId]?.busy || []).length) {
+      return json({ error: 'Room is not available for the selected dates.' }, 409);
+    }
+    const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(bookingRef));
+    const eventId = [...new Uint8Array(hash)].map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 32);
+    const eventResponse = await fetch('https://www.googleapis.com/calendar/v3/calendars/' + encodeURIComponent(calendarId) + '/events', {
+      method: 'POST',
+      headers: { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        id: eventId,
+        summary: 'Rezervare – ' + guestName.trim(),
+        description: 'Referință: ' + bookingRef + '\\nTelefon: ' + phone + '\\nAdulți: ' + adults + '\\nCopii: ' + children + '\\nSursă: WhatsApp',
+        start: { date: checkIn, timeZone: 'Europe/Bucharest' },
+        end: { date: checkOut, timeZone: 'Europe/Bucharest' },
+        visibility: 'private',
+        transparency: 'opaque'
+      })
+    });
+    const eventData = await eventResponse.json();
+    if (eventResponse.status === 409) {
+      return json({ ok: true, duplicate: true, roomNumber, bookingRef, eventId });
+    }
+    if (!eventResponse.ok) {
+      console.error('Google Calendar event creation failed:', eventData?.error?.message || eventResponse.status);
+      return json({ error: 'Could not create the calendar reservation.' }, 502);
+    }
+    return json({ ok: true, roomNumber, bookingRef, eventId, htmlLink: eventData.htmlLink || null }, 201);
+  } catch (error) {
+    console.error('Calendar booking error:', error?.message || error);
+    return json({ error: 'Google Calendar booking failed.' }, 503);
   }
 }

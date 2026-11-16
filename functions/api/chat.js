@@ -38,7 +38,8 @@ function b64url(value) {
 
 async function getCalendarBusy(env, userMessage) {
   const ids = (env.GOOGLE_CALENDAR_IDS || env.GOOGLE_CALENDAR_ID || '').split(',').map(x => x.trim()).filter(Boolean);
-  if (!ids.length || !env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !env.GOOGLE_PRIVATE_KEY) return null;
+  const privateKey = env.GOOGLE_PRIVATE_KEY || env['GOOGLE_PRIVATE_KEY.'];
+  if (!ids.length || !env.GOOGLE_SERVICE_ACCOUNT_EMAIL || !privateKey) return null;
   const dates = [...userMessage.matchAll(/\b(20\d{2})-(\d{2})-(\d{2})\b/g)].map(m => m[0]);
   const roDates = [...userMessage.matchAll(/\b(\d{1,2})[./](\d{1,2})[.\\/](20\d{2})\b/g)]
     .map(m => `${m[3]}-${m[2].padStart(2,'0')}-${m[1].padStart(2,'0')}`);
@@ -56,7 +57,7 @@ async function getCalendarBusy(env, userMessage) {
     exp: now + 3600
   }));
   const unsigned = header + '.' + claim;
-  const pem = env.GOOGLE_PRIVATE_KEY.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, '');
+  const pem = privateKey.replace(/-----BEGIN PRIVATE KEY-----|-----END PRIVATE KEY-----|\s/g, '');
   const keyBytes = Uint8Array.from(atob(pem), ch => ch.charCodeAt(0));
   const key = await crypto.subtle.importKey('pkcs8', keyBytes, { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' }, false, ['sign']);
   const sig = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));

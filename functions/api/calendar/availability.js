@@ -87,11 +87,11 @@ export async function onRequestPost({ request, env }) {
   let body;
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON.' }, 400); }
   const { checkIn, checkOut, roomNumber, guestName, phone, adults = 1, children = 0, bookingRef } = body || {};
-  const validDate = value => typeof value === 'string' && /^\\d{4}-\\d{2}-\\d{2}$/.test(value) && !Number.isNaN(Date.parse(value + 'T00:00:00Z'));
+  const validDate = value => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) && !Number.isNaN(Date.parse(value + 'T00:00:00Z'));
   if (!validDate(checkIn) || !validDate(checkOut) || checkOut <= checkIn ||
       !Number.isInteger(roomNumber) || roomNumber < 1 || roomNumber > 7 ||
       typeof guestName !== 'string' || guestName.trim().length < 2 || guestName.length > 100 ||
-      typeof phone !== 'string' || !/^\\+?[0-9 ()-]{8,20}$/.test(phone) ||
+      typeof phone !== 'string' || !/^\+?[0-9 ()-]{8,20}$/.test(phone) ||
       !Number.isInteger(adults) || adults < 1 || adults > 12 ||
       !Number.isInteger(children) || children < 0 || children > 10 ||
       typeof bookingRef !== 'string' || !/^[A-Za-z0-9_-]{8,64}$/.test(bookingRef)) {
@@ -129,7 +129,7 @@ export async function onRequestPost({ request, env }) {
       body: JSON.stringify({
         id: eventId,
         summary: 'Rezervare – ' + guestName.trim(),
-        description: 'Referință: ' + bookingRef + '\\nTelefon: ' + phone + '\\nAdulți: ' + adults + '\\nCopii: ' + children + '\\nSursă: WhatsApp',
+        description: 'Referință: ' + bookingRef + '\nTelefon: ' + phone + '\nAdulți: ' + adults + '\nCopii: ' + children + '\nSursă: WhatsApp',
         start: { date: checkIn, timeZone: 'Europe/Bucharest' },
         end: { date: checkOut, timeZone: 'Europe/Bucharest' },
         visibility: 'private',

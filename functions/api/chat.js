@@ -4,10 +4,10 @@ INFORMAȚII CONFIRMATE:
 - Adresă: Calea Transilvaniei nr. 40, Câmpulung Moldovenesc, județul Suceava.
 - Telefon rezervări: 0787 445 908.
 - E-mail: casa.domneasca.rarau@gmail.com.
-- Sunt prezentate cinci camere: două camere duble și trei camere triple.
+- Pensiunea are șapte camere: două camere duble, două camere triple și trei camere quadruple.
 - Camerele duble au tarif publicat pe site de 300 lei/noapte.
-- Micul dejun este inclus.
-- Pensiunea are bucătărie à la carte, cramă și două terase.
+- Micul dejun este inclus pentru camerele duble. Pentru camerele triple și quadruple, opțiunile de mic dejun se confirmă direct la rezervare.
+- Pensiunea are bucătărie à la carte, cramă și două terase. Restaurantul servește doar oaspeții cazați, iar preparatele se gătesc la comandă.
 - Booking.com: https://www.booking.com/Share-s1Ei3kV
 - Profil Google: https://share.google/m5p5IkVSNi2MW0wg5
 - Scoruri comunicate de pensiune: Google 4,9/5; Booking.com 9,9/10; Tripadvisor 5/5; TuristInfo 10/10; Travelminit 9,9/10. Nu afirma că ai preluat recenzii live.
@@ -21,7 +21,7 @@ TRASEE TURISTICE DIN PLIANTELE FURNIZATE DE PROPRIETAR:
 
 REGULI:
 - Nu inventa tarife, disponibilitate, politici de anulare, ore de check-in/out, servicii sau facilități care nu sunt enumerate aici.
-- Pentru camere triple, perioade, disponibilitate, tarife actuale, grupuri sau solicitări speciale, spune că informațiile se confirmă direct la pensiune și oferă telefonul/e-mailul.
+- Pentru camere triple și quadruple, perioade, disponibilitate, tarife actuale, grupuri sau solicitări speciale, spune că informațiile se confirmă direct la pensiune și oferă telefonul/e-mailul.
 - Nu confirma și nu efectua rezervări. Poți colecta în conversație perioada, numărul de persoane și tipul camerei, apoi îndruma clientul să confirme direct cu pensiunea.
 - Nu solicita date de card, parole sau date personale sensibile.
 - Rezervarea directă la pensiune este opțiunea recomandată. Booking este o platformă externă. Nu recomanda Travelminit pentru rezervare.
@@ -80,6 +80,14 @@ async function getCalendarBusy(env, userMessage) {
   const data = await busyResponse.json();
   if (!busyResponse.ok) throw new Error('Google Calendar lookup failed');
   return { start, end, calendars: data.calendars || {} };
+}
+
+// Endpointul este o interfață API, nu o pagină HTML pentru indexarea Google.
+export async function onRequestGet() {
+  return Response.json(
+    { error: 'Acest endpoint acceptă doar solicitări POST.' },
+    { status: 405, headers: { 'Allow': 'POST', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex, nofollow' } }
+  );
 }
 
 export async function onRequestPost({ request, env }) {

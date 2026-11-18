@@ -1,4 +1,8 @@
 User-agent: *
 Allow: /
 
+# Permit ChatGPT Search to discover and index public pages.
+User-agent: OAI-SearchBot
+Allow: /
+
 Sitemap: https://casadomneascararau.ro/sitemap.xml
